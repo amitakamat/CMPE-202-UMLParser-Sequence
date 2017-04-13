@@ -25,6 +25,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import net.sourceforge.plantuml.SourceStringReader;
 
 /**
  * @author Amita Vasudev Kamat
@@ -39,6 +40,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 
 public class UmlParserSequence {
 	private static File ClassDir;
+	private static String grammar = "@startuml\n";
 
 	public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException {
 		// TODO Auto-generated method stub
@@ -66,6 +68,19 @@ public class UmlParserSequence {
 							//readSourceCode(sourceCodeFiles, sourceFolder);
 							injectAspect(sourceFolder);
 							runProgram(sourceFolder);
+							grammar += "@enduml";
+							System.out.println("Grammar: " + grammar);
+							String outputFile = "/home/amita/GitHub 202/CMPE-202-UMLParser-Sequence/Output-Diagrams/OutputSequenceDiagram2.png";
+							//String grammar = GrammarEngine.generateGrammar(ClassInterfaceDetails, classNames, interfaceNames);
+							//String grammar = "@startuml\nAlice -> Bob: Authentication Request\nBob --> Alice: Authentication Response\nAlice -> Bob: Another authentication Request\nAlice <-- Bob: another authentication Response\n@enduml";
+							try{
+								SourceStringReader grammarReader = new SourceStringReader(grammar);
+								FileOutputStream outputStream = new FileOutputStream(outputFile);
+								grammarReader.generateImage(outputStream);
+							}
+							catch(Exception e){
+								System.out.println(e.getMessage());
+							}
 						}
 					}
 					catch(Exception e)
@@ -202,6 +217,7 @@ public class UmlParserSequence {
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			while ((line = input.readLine()) != null) {
 			    System.out.println(line);
+			    generateGrammar(line);
 			}
 			System.out.println("Program execution stderr:");
 
@@ -209,6 +225,7 @@ public class UmlParserSequence {
 			while ((line = error.readLine()) != null) {
 				System.out.println(line);
 			}
+			//grammar = parseTraceAndGenerateGrammar(input);
 		  input.close();
 		  error.close();
 		}
@@ -279,5 +296,21 @@ public class UmlParserSequence {
 		 catch(Exception ex){
 				System.out.println(ex.getMessage());
 		}
+	 }
+	 
+	 private static void generateGrammar(String trace){
+		// grammar += "@startuml\n";
+		 try{
+		 	if(trace.contains("->") || trace.contains("-->") || trace.contains("activate") || trace.contains("deactivate"))
+			 {
+				 grammar += trace + "\n";
+			 }
+			 // System.out.println(line);
+		 }
+		 catch(Exception ex){
+				System.out.println(ex.getMessage());
+			}
+		 //grammar += "@enduml";
+		 //System.out.println("Grammar: " + grammar);
 	 }
 }
