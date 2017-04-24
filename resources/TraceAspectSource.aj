@@ -2,6 +2,8 @@ import org.aspectj.lang.JoinPoint;
 import java.lang.Object;
 import java.util.Stack;
 import java.util.ArrayList;
+import org.aspectj.lang.reflect.MethodSignature;
+import java.lang.reflect.Method;
 
 public aspect TraceAspectSource {
     private int callDepth;
@@ -23,7 +25,7 @@ public aspect TraceAspectSource {
 		print("After", thisJoinPoint);
 	}
 
-	pointcut constTrace() : execution(*.new(..)) && !within(TraceAspectSource);
+	/*pointcut constTrace() : execution(*.new(..)) && !within(TraceAspectSource);
 
     before() : constTrace() {
     	isConst = true;
@@ -37,7 +39,7 @@ public aspect TraceAspectSource {
     	callDepth--;
 		print("After", thisJoinPoint);
 		isConst = false;
-    }
+    }*/
 
 	private void print(String prefix, JoinPoint m) {
 		//for (int i = 0; i < callDepth; i++) {
@@ -47,15 +49,17 @@ public aspect TraceAspectSource {
 			methodStack.push("Main");
 		}
 		if (m.getSignature().toString().toLowerCase().indexOf("main.main") == -1 ) {
-			if(isConst){
+			/*if(isConst){
 				if(prefix == "Before"){
 					/*if(methodStack.peek().toString().equals("Main")){
 						System.out.println("activate Main");
-					}*/
-					String method = m.getSignature().toString();
-					int openIndex = method.indexOf("(");
-					if(openIndex != -1){
-						String targetParticipant = method.substring(0, openIndex);
+					}
+					if(m.getTarget() != null){
+						System.out.println("Current object: " + m.getTarget().getClass().getName());
+				
+						String method = m.getSignature().toString();
+						//String targetParticipant = ":" + m.getTarget().getClass().getName();
+						String targetParticipant = m.getTarget().getClass().getName();
 						System.out.println(methodStack.peek().toString() + " -> " + targetParticipant + " : <<create>>\n" );
 						methodStack.push(targetParticipant);
 						System.out.println(String.format("activate %s", targetParticipant));
@@ -64,11 +68,11 @@ public aspect TraceAspectSource {
 					System.out.println(method.split("("));
 					String targetParticipant = m.toString().split("(")[1];
 					System.out.println(methodStack.peek().toString() + " -> " + targetParticipant + " : <<create>>\n" );
-					methodStack.push(targetParticipant);*/
+					methodStack.push(targetParticipant);
 				}
 				else{
 					String sourceParticipant = methodStack.pop().toString();
-					System.out.println(sourceParticipant + " : " + methodStack.peek().toString());
+					//System.out.println(sourceParticipant + " : " + methodStack.peek().toString());
 					if(!sourceParticipant.equals(methodStack.peek().toString())){
 						System.out.println(sourceParticipant + " --> " + methodStack.peek().toString());
 						//System.out.println(String.format("deactivate %s", sourceParticipant));
@@ -76,33 +80,36 @@ public aspect TraceAspectSource {
 					System.out.println(String.format("deactivate %s", sourceParticipant));
 					/*if(methodStack.peek().toString().equals("Main")){
 						System.out.println("deactivate Main");
-					}*/
+					}
 				}
 				
 			}
-			else{
+			else{*/
 				//System.out.println(prefix);
 				if(prefix == "Before"){
 					/*if(methodStack.peek().toString().equals("Main")){
 						System.out.println("activate Main");
 					}*/
-					String method = m.getSignature().toString();
-					String returnType = method.substring(0, method.indexOf(" "));
-					String targetParticipant = method.substring(method.indexOf(" ") + 1, method.indexOf("."));
-					String methodName = method.substring(method.indexOf(".") + 1, method.indexOf("(")) + "():" + returnType;
-					/*String fullMethod = m.toString().split("(")[1];
-					String[] type = fullMethod.split(" ");
-					String returnType = type[0];
-					String[] method = type[1].split(".");
-					String targetParticipant = method[0];
-					//MethodSignature ms = m.getSignature();
-					//Method method = ms.getMethod();
-					System.out.println(m.toString());//.toString().split("."));
-					//String targetParticipant = "";// = method.[0];*/
-					System.out.println(String.format("%s -> %s : %s", methodStack.peek().toString(), targetParticipant, methodName));
-					//System.out.println( + " -> " + targetParticipant + " : " + methodName + "()\n" );
-					methodStack.push(targetParticipant);
-					System.out.println(String.format("activate %s", targetParticipant));
+					if(m.getTarget() != null){
+						Method method = ((MethodSignature) m.getSignature()).getMethod();
+						String returnType = method.getReturnType().getName().toString().replace("java.lang.","");
+						//String targetParticipant = ":" + m.getTarget().getClass().getName();
+						String targetParticipant = m.getTarget().getClass().getName();
+						String methodName = method.getName() + "():" + returnType;
+						/*String fullMethod = m.toString().split("(")[1];
+						String[] type = fullMethod.split(" ");
+						String returnType = type[0];
+						String[] method = type[1].split(".");
+						String targetParticipant = method[0];
+						//MethodSignature ms = m.getSignature();
+						//Method method = ms.getMethod();
+						System.out.println(m.toString());//.toString().split("."));
+						//String targetParticipant = "";// = method.[0];*/
+						System.out.println(String.format("%s -> %s : %s", methodStack.peek().toString(), targetParticipant, methodName));
+						//System.out.println( + " -> " + targetParticipant + " : " + methodName + "()\n" );
+						methodStack.push(targetParticipant);
+						System.out.println(String.format("activate %s", targetParticipant));
+					}
 				}
 				else{
 					String sourceParticipant = methodStack.pop().toString();
@@ -128,7 +135,7 @@ public aspect TraceAspectSource {
 				if(m.getArgs().length > 0){
 					System.out.println("EndArguments:");
 				}*/
-			}
+			//}
 			//System.out.println();
 		}
 	}
