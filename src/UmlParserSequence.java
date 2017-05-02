@@ -1,3 +1,9 @@
+/**
+ * @author Amita Vasudev Kamat
+ * 
+ * CMPE - 202 - Personal Project - Sequence Diagram
+ *  Spring 2017
+ */
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,20 +24,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-//import com.amitakamat.umlparser.ClassInterfaceInfo;
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
 import net.sourceforge.plantuml.SourceStringReader;
-
-/**
- * @author Amita Vasudev Kamat
- * 
- * CMPE - 202 - Personal Project Spring 2017
- */
 
 /**
  * 
@@ -67,7 +60,6 @@ public class UmlParserSequence {
 							outputFileName = args[1];
 						}
 						
-						//String sourceFolder = "/home/amita/workspace/uml-sequence-test/";
 						ClassDir = new File(sourceFolder);
 						ArrayList<String> sourceCodeFiles = getJavaSourceFiles(sourceFolder);
 						if(sourceCodeFiles.size() == 0)
@@ -76,18 +68,20 @@ public class UmlParserSequence {
 						}
 						else
 						{
-							//readSourceCode(sourceCodeFiles, sourceFolder);
 							injectAspect(sourceFolder);
 							runProgram(sourceFolder);
 							grammar += "@enduml";
 							System.out.println("Grammar: " + grammar);
 							String outputFile = "../Output-Diagrams/" + outputFileName;
+							System.out.println("Creating sequence diagram....");
 							try{
 								SourceStringReader grammarReader = new SourceStringReader(grammar);
 								FileOutputStream outputStream = new FileOutputStream(outputFile);
 								grammarReader.generateImage(outputStream);
+								System.out.println("Sequence diagram created successfully....");
 							}
 							catch(Exception e){
+								System.out.println("Sequence diagram creation failed....");
 								System.out.println(e.getMessage());
 							}
 						}
@@ -108,14 +102,7 @@ public class UmlParserSequence {
 		ArrayList<String> javaFiles = new ArrayList<String>();
 		
 		try
-		{
-			//Create a log file to record all the operations carried out.
-			BufferedWriter writer = new BufferedWriter(new FileWriter(new File("../LogFile.txt")));
-			
-			writer.write("Logs\n\n");
-			writer.write("--------Extracting java files from source Folder-----------------\n");
-			
-		
+		{		
 			File sourceDirectory = new File(sourceFolder);
 			
 			//Check if source folder provided in input exists t the given path
@@ -126,18 +113,15 @@ public class UmlParserSequence {
 			  {
 				  if (file.getName().endsWith((".java"))) 
 				  {
-			    	writer.write(file.getName() + " extracted \n");
 			    	javaFiles.add(file.getName());
 				  }
 			  }
 			}
 			else
 			{
-				writer.write("Error : Source Directory not found.\n\n");
 				System.out.println("Source Directory not found. Please ensure the path is correct and try again.");
 			}
 			
-			writer.close();
 		}
 		catch(Exception e)
 		{
@@ -146,142 +130,91 @@ public class UmlParserSequence {
 		return javaFiles;
 
 	}
-
+	
 	/**
-	 * Method to read the source files 
-	 * @param javaSourceFiles list of java source files
-	 * @param sourceFolderPath path of directory which contains the source files
+	 * Method to compile and run the source code
+	 * @param path path of source folder
 	 */
-	private static void readSourceCode(ArrayList<String> javaSourceFiles, String sourceFolderPath){
-		StringBuilder fileContents = new StringBuilder();
-		for(int i=0; i<javaSourceFiles.size(); i++){
-			try
-			{
-				InputStream inputStream = new FileInputStream(sourceFolderPath + "/" + javaSourceFiles.get(i));
-				BufferedReader bufferReader = new BufferedReader(new InputStreamReader(inputStream));
-				String eachLineContent = bufferReader.readLine();
-				
-				while(eachLineContent!=null)
-				{
-					fileContents.append(eachLineContent + "\n");
-					eachLineContent = bufferReader.readLine();
-				}
-				
-				bufferReader.close();
-
-			}
-			catch(Exception e)
-			{
-				System.out.println("\n" + e.getMessage());
-			}
-		}
-		String parseContent = fileContents.toString().replace("import", "//import");
-		parseCode(parseContent);
-	}
-	
-	private static void parseCode(String fileContent){
-		CompilationUnit compileUnit = JavaParser.parse(fileContent);
-		NodeList<TypeDeclaration<?>> types = compileUnit.getTypes();
-		
-		ArrayList<String> classNames = getClassNames(types);
-	}
-	
-	private static ArrayList<String> getClassNames(NodeList<TypeDeclaration<?>> types){
-		ArrayList<String> classNames = new ArrayList<String>();
-		for(int i=0; i< types.size(); i++){
-			TypeDeclaration<?> node = types.get(i);
-			if(node instanceof ClassOrInterfaceDeclaration && !((ClassOrInterfaceDeclaration) node).isInterface()){
-				classNames.add(node.getNameAsString());
-			}
-		}
-		
-		return classNames;
-	}
-	
 	private static void runProgram(String path){
 		Runtime rt = Runtime.getRuntime();
-		String compileCommand = "ajc -1.5 -classpath .:../../Dependency/javaparser-core-3.1.0.jar:../../Dependency/aspectjrt.jar *.java *.aj";
-		String runCommand = "java -classpath .:../../Dependency/aspectjrt.jar Main";
+		String compileCommand = "ajc -1.5 -classpath .:aspectjrt.jar *.java *.aj";
+		String runCommand = "java -classpath .:aspectjrt.jar Main";
 	    String line;
-		//System.out.println(System.getProperty("user.dir"));
 		try{
+			System.out.println("Attempting source program compilation...");
 			Process p = rt.exec(compileCommand, null, new File(path));
 			p.waitFor();
-			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			while ((line = input.readLine()) != null) {
-			   System.out.println(line);
-			}
-			System.out.println("ERROR");
-			BufferedReader error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			while ((line = error.readLine()) != null) {
-				System.out.println(line);
-			}
 			System.out.println("Program compiled properly");
 
+			System.out.println("Attempting source program execution...");
 			p = rt.exec(runCommand, null, new File(path));
 			p.waitFor();
-			System.out.println("Program execution attempted");
 			System.out.println("Program execution stdout: ");
 
-			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			while ((line = input.readLine()) != null) {
 			    System.out.println(line);
 			    generateGrammar(line);
 			}
 			System.out.println("Program execution stderr:");
 
-			error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			BufferedReader error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 			while ((line = error.readLine()) != null) {
 				System.out.println(line);
 			}
-			//grammar = parseTraceAndGenerateGrammar(input);
+
 		  input.close();
 		  error.close();
 		}
 		catch(Exception ex){
 			System.out.println(ex.getMessage());
 		}
-	}
+	 }
 	 
+	/**
+	 * Method to inject aspect and dependency jar in source code
+	 * @param path path of source folder
+	 */
 	 private static void injectAspect(String path){
-		 //String source = "../resources/";
-		 File source = new File("../resources/TraceAspectSource.aj");
-         File dest = new File(path + "/TraceAspectSource.aj");
+		 File[] source = {new File("../resources/TraceAspectSource.aj"),new File("../resources/aspectjrt.jar")};
+         File[] dest = {new File(path + "/TraceAspectSource.aj"), new File(path + "/aspectjrt.jar")};
 		 try{
-			 InputStream is = null;
-			 OutputStream os = null;
-			 try {
-		        is = new FileInputStream(source);
-		        os = new FileOutputStream(dest);
-		        byte[] buffer = new byte[1024];
-		        int length;
-		        while ((length = is.read(buffer)) > 0) {
-		            os.write(buffer, 0, length);
-		        }
-			 } 
-			 finally {
-		        is.close();
-		        os.close();
-		     }
+			 for(int i=0; i<source.length; i++){
+				 InputStream is = null;
+				 OutputStream os = null;
+				 try {
+			        is = new FileInputStream(source[i]);
+			        os = new FileOutputStream(dest[i]);
+			        byte[] buffer = new byte[1024];
+			        int length;
+			        while ((length = is.read(buffer)) > 0) {
+			            os.write(buffer, 0, length);
+			        }
+				 } 
+				 finally {
+			        is.close();
+			        os.close();
+			     }
+			 }
 		 }
 		 catch(Exception ex){
 				System.out.println(ex.getMessage());
 		}
 	 }
 	 
+	/**
+	 * Method to filter grammar based on trace output of source code
+	 * @param trace trace of source code
+	 */
 	 private static void generateGrammar(String trace){
-		// grammar += "@startuml\n";
 		 try{
 		 	if(trace.contains("->") || trace.contains("-->") || trace.contains("activate") || trace.contains("deactivate"))
 			 {
 				 grammar += trace + "\n";
 			 }
-			 // System.out.println(line);
 		 }
 		 catch(Exception ex){
 				System.out.println(ex.getMessage());
-			}
-		 //grammar += "@enduml";
-		 //System.out.println("Grammar: " + grammar);
+		}
 	 }
 }
