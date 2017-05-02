@@ -46,17 +46,27 @@ public class UmlParserSequence {
 		// TODO Auto-generated method stub
 
 		//Check for input arguments
-				//if(args.length == 0)
-					//System.out.println("Input Invalid. Please provide source code folder path.");
+				if(args.length == 0)
+					System.out.println("Input Invalid. Please provide source code folder path.");
 
-				//else if(args.length > 2)
-					//System.out.println("Input Invalid. Too many input arguments.");
+				else if(args.length > 2)
+					System.out.println("Input Invalid. Too many input arguments.");
 				
-				//else
-				//{
+				else
+				{
 					try{
-						//String sourceFolder = args[0];
-						String sourceFolder = "/home/amita/workspace/uml-sequence-test/";
+						String sourceFolder = args[0];
+						
+						if(args.length == 1)
+						{
+							outputFileName = "OutputSequenceDiagram.png";
+						}
+						else
+						{
+							outputFileName = args[1];
+						}
+						
+						//String sourceFolder = "/home/amita/workspace/uml-sequence-test/";
 						ClassDir = new File(sourceFolder);
 						ArrayList<String> sourceCodeFiles = getJavaSourceFiles(sourceFolder);
 						if(sourceCodeFiles.size() == 0)
@@ -70,9 +80,7 @@ public class UmlParserSequence {
 							runProgram(sourceFolder);
 							grammar += "@enduml";
 							System.out.println("Grammar: " + grammar);
-							String outputFile = "/home/amita/GitHub 202/CMPE-202-UMLParser-Sequence/Output-Diagrams/OutputSequenceDiagram2.png";
-							//String grammar = GrammarEngine.generateGrammar(ClassInterfaceDetails, classNames, interfaceNames);
-							//String grammar = "@startuml\nAlice -> Bob: Authentication Request\nBob --> Alice: Authentication Response\nAlice -> Bob: Another authentication Request\nAlice <-- Bob: another authentication Response\n@enduml";
+							String outputFile = "../Output-Diagrams/" + outputFileName;
 							try{
 								SourceStringReader grammarReader = new SourceStringReader(grammar);
 								FileOutputStream outputStream = new FileOutputStream(outputFile);

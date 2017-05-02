@@ -41,70 +41,33 @@ public aspect TraceAspectSource {
 		isConst = false;
     }*/
 
-	private void print(String prefix, JoinPoint m) {
-		//for (int i = 0; i < callDepth; i++) {
-			//System.out.print(".");
-		//} 
+	private void print(String prefix, JoinPoint m) { 
 		if(methodStack.empty()){
 			methodStack.push("Main");
 		}
 		if (m.getSignature().toString().toLowerCase().indexOf("main.main") == -1 ) {
-			/*if(isConst){
 				if(prefix == "Before"){
-					/*if(methodStack.peek().toString().equals("Main")){
-						System.out.println("activate Main");
-					}
-					if(m.getTarget() != null){
-						System.out.println("Current object: " + m.getTarget().getClass().getName());
-				
-						String method = m.getSignature().toString();
-						//String targetParticipant = ":" + m.getTarget().getClass().getName();
-						String targetParticipant = m.getTarget().getClass().getName();
-						System.out.println(methodStack.peek().toString() + " -> " + targetParticipant + " : <<create>>\n" );
-						methodStack.push(targetParticipant);
-						System.out.println(String.format("activate %s", targetParticipant));
-					}
-					/*System.out.println(method.indexOf("("));
-					System.out.println(method.split("("));
-					String targetParticipant = m.toString().split("(")[1];
-					System.out.println(methodStack.peek().toString() + " -> " + targetParticipant + " : <<create>>\n" );
-					methodStack.push(targetParticipant);
-				}
-				else{
-					String sourceParticipant = methodStack.pop().toString();
-					//System.out.println(sourceParticipant + " : " + methodStack.peek().toString());
-					if(!sourceParticipant.equals(methodStack.peek().toString())){
-						System.out.println(sourceParticipant + " --> " + methodStack.peek().toString());
-						//System.out.println(String.format("deactivate %s", sourceParticipant));
-					}
-					System.out.println(String.format("deactivate %s", sourceParticipant));
-					/*if(methodStack.peek().toString().equals("Main")){
-						System.out.println("deactivate Main");
-					}
-				}
-				
-			}
-			else{*/
-				//System.out.println(prefix);
-				if(prefix == "Before"){
-					/*if(methodStack.peek().toString().equals("Main")){
-						System.out.println("activate Main");
-					}*/
 					if(m.getTarget() != null){
 						Method method = ((MethodSignature) m.getSignature()).getMethod();
 						String returnType = method.getReturnType().getName().toString().replace("java.lang.","");
-						//String targetParticipant = ":" + m.getTarget().getClass().getName();
-						String targetParticipant = m.getTarget().getClass().getName();
-						String methodName = method.getName() + "():" + returnType;
-						/*String fullMethod = m.toString().split("(")[1];
-						String[] type = fullMethod.split(" ");
-						String returnType = type[0];
-						String[] method = type[1].split(".");
-						String targetParticipant = method[0];
-						//MethodSignature ms = m.getSignature();
-						//Method method = ms.getMethod();
-						System.out.println(m.toString());//.toString().split("."));
-						//String targetParticipant = "";// = method.[0];*/
+						String targetParticipant = m.getTarget().toString();// + ":" + m.getTarget().getClass().getName();
+						System.out.println("Target is " + m.getTarget());
+						String parameters = "";
+						for (int i=0; i<m.getArgs().length; i++)
+						{
+							Object obj = m.getArgs()[i];
+							if(obj != null){
+								if(i == m.getArgs().length - 1)
+								{
+									parameters += obj.toString() + " : " + obj.getClass().getName().replace("java.lang.", "");
+								}
+								else
+								{
+									parameters += obj.toString()  + " : " + obj.getClass().getName().replace("java.lang.", "") + ", ";
+								}
+							}
+						}
+						String methodName = String.format("%s(%s) : %s",method.getName() , parameters , returnType);
 						System.out.println(String.format("%s -> %s : %s", methodStack.peek().toString(), targetParticipant, methodName));
 						//System.out.println( + " -> " + targetParticipant + " : " + methodName + "()\n" );
 						methodStack.push(targetParticipant);
