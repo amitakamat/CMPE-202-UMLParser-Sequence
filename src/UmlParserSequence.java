@@ -41,6 +41,7 @@ import net.sourceforge.plantuml.SourceStringReader;
 public class UmlParserSequence {
 	private static File ClassDir;
 	private static String grammar = "@startuml\n";
+	private static String outputFileName;
 
 	public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException {
 		// TODO Auto-generated method stub
@@ -95,7 +96,7 @@ public class UmlParserSequence {
 					{
 						System.out.println(e.getMessage());
 					}
-				//}
+				}
 	}
 	
 	/**
@@ -241,44 +242,6 @@ public class UmlParserSequence {
 			System.out.println(ex.getMessage());
 		}
 	}
-	
-	 public static void InvokeOtherMain() throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException, ClassNotFoundException {
-	        URL url = ClassDir.toURI().toURL();
-	        URL[] ClassURLs = new URL[] {url};
-	        
-	        ArrayList<String> classes = new ArrayList<String>();
-			
-			//Check if source folder provided in input exists t the given path
-			if(ClassDir.isDirectory())
-			{
-		
-			  for (File file : ClassDir.listFiles()) 
-			  {
-				  if (file.getName().endsWith((".class"))) 
-				  {
-			    	//writer.write(file.getName() + " extracted \n");
-			    	classes.add(file.getName().replace(".class", ""));
-				  }
-			  }
-			}
-			else
-			{
-				//writer.write("Error : Source Directory not found.\n\n");
-				System.out.println("Source Directory not found. Please ensure the path is correct and try again.");
-			}
-	        
-	        
-	        ClassLoader cl = new URLClassLoader(ClassURLs);
-	        
-	        for(String eachClass: classes){
-				Class newClass = cl.loadClass(eachClass);
-			}
-	        
-	        Class cls = cl.loadClass("Main");
-	        Method method = cls.getMethod("main", String[].class);
-	        String[] params = null;
-	        method.invoke(null, (Object) params);
-	    }
 	 
 	 private static void injectAspect(String path){
 		 //String source = "../resources/";
