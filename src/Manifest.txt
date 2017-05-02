@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: ../resources/plantuml.jar
+Main-Class: UmlParserSequence
+
