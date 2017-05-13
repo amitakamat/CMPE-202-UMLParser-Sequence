@@ -2,12 +2,12 @@
 
 Steps to run the program:
 
-1. Navigate to src folder.
-~/GitHub 202/CMPE-202-UMLParser-Sequence/src
+1.Navigate to CMPE-202-UMLParser-Sequence/src  
+ cd CMPE-202-UMLParser-Sequence/src
 
-2. Compile the files. Make sure the dependencies are in the path provided.
-ajc -1.5 -classpath ".:../../../Dependency/javaparser-core-3.1.0.jar:../../../Dependency/aspectjrt.jar" *.java *.aj
+2.Run the jar file  
+java -jar UmlSequence.jar <<Source_Folder_Path>> <<Output_File_name>>  
+Please give output file name in png format only.
 
-3. Run the java file.
-java -classpath ".:../../../Dependency/javaparser-core-3.1.0.jar:../../../Dependency/aspectjrt.jar" UmlParserSequence
+3.The diagram will get created in the folder "Output-Diagrams" with the name provided in arguments.
 
